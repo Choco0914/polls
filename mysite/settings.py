@@ -31,14 +31,22 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'polls.apps.PollsConfig',
+    # Django에 polls app을 참조하게 하기위해 추가하였다
     'django.contrib.admin',
+    # 관리용 사이트
     'django.contrib.auth',
+    # 인증 시스템
     'django.contrib.contenttypes',
+    # 컨텐츠 타입을 위한 프레임워크
     'django.contrib.sessions',
+    #세션 프레임워크
     'django.contrib.messages',
+    # 메시징 프레임워크
     'django.contrib.staticfiles',
+    # 정적 파일을 관리하는 프레임워크
 ]
-
+# app들을 사용하기 위해서는 INSTALLED_APPS 안에 app을 등록해야 django가 인식한다
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -105,8 +113,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Asia/Seoul'
+# TIME_ZONE을 한국 시간에 맞춰 설정했다
 USE_I18N = True
 
 USE_L10N = True

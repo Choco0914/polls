@@ -3,10 +3,16 @@ from django.urls import path
 # polls 디렉토리에서 URlconf를 생성하려면 urls.py라는 파일이 있어야한다
 from . import views
 
+app_name = 'polls'
+"""
+실제 Django의 project는 app이 몇개라도 올수있다 만약 blog라는 app이 있을 경우
+Django 는 이름공간(namespace)을 추가하여 이를 구별할수 있게 역할을해준다
+app_name을 추가하여 app의 이름공간을 설정할수있다 
+"""
 urlpatterns = [
     # ex: /polls/
     path('', views.index, name='index'),
-    # ex: /polls/5/
+    # name 값은 {% url %} template tag에 의해 불러올수있다
     path('<int:question_id>', views.detail, name='detail'),
     # ex: /polls/5/results/
     path('<int:question_id>/results/', views.results, name='results'),

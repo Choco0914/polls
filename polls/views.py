@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views import generic
 """
 template 에 context를 채워 표현한 결과를 HttpResponse 객체와 함께 돌려주는 구문은
 자주 쓰인다 따라서 Django는 이런 표현을 쉽게 표현할수 있도록 단축 기능(shortcuts)을
@@ -12,36 +13,35 @@ render를 이용하자
 # HttpREsponse는 사용자가 원하는 페이지의 요청을 반환해주는 역할을해준다
 from .models import Choice, Question
 # 데이터베이스의 레코드를 읽기위해 models의 Question클래스를 임포트했다
-def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_question_list}
-    return render(request, 'polls/index.html', context)
-    """
-    render()함수는 request객체를 첫번째 인수로 받고, template이름을
-    두번째 인수로받으며, context 사전형 객체를 세번째 선택적(optional)인수로 받는다
-    인수로 지정된 context 로 표현된 template 의 HttpResponse 객체가 반환된다
-    """
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_question_list'
 
-def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    # view는 요청된 질문의 Id 가 없을 경우 Http404 예외를 발생시킨다
-    """
-    get_object_or_404함수는 Django 모델을 첫번째 인자로 받고, 몇개의 키워드
-    인수를 모델 관리자의 get()함수에 넘긴다 만약 객체가 존재하지 않을 경우,
-    Http404 예외가 발생한다
-    """
-    return render(request, 'polls/detail.html', {'question': question})
-"""
-detail(request=<HttpRequest object>, question_id=34)
-question_id=34 부분은 <int:question_id>에서 왔다 괄호를 사용하여 URL의 일부를
-"캡쳐"하고, 해당 내용을 keyward 인수로서 view함수로 전달한다 문자열의:question_id>
-부분은 일치되는 패턴을 구별하기 위해 정의한 이름이며, <int:부분은 어느 패턴이
-해당 URL 경로에 일치되어야 하는지를 결정하는 컨버터 이다
-"""
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/results.html', {'question': question})
+    def get_queryset(self):
+        """Return the last five published question."""
+        return Question.objects.order_by('-pub_date')[:5]
 
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'polls/detail.html'
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name= 'polls/results.html'
+
+    """
+    각 제너릭 뷰는 어떤 모델이 적용될 것인지 알아야한다 이것은 model 속성을 사용해
+    제공한다 DetailView 제너릭 뷰는 URL에서 캡쳐 된 기본 값이 pk\ 라고 기대하기
+    때문에 'question_id'를 제너릭 뷰를 위해 pk로 변경했다
+    기본적으로 DEtailView 제너릭 뷰는 <app name>/<model name>_detail.html템플릿을
+    사용한다 우리의 경우 polls/question_detail.html 템플릿을 사용한다
+    template_name 속성은 Django에게 자동 생성 된 기본 템플릿 이름 대신 뷰가
+    렌더링 될 때 서로 다른 모습을 갖도록 한다 이들이 둘다 동일한 DetailView를
+    사용하고 있더라도 말이다
+    마찬가지로 ListView 제너릭 뷰는<app name>/<model name>_list.html 템플릿을
+    기본으로 사용한다 이미 있는 polls/index.html 템플릿을 사용하기 위해
+    LiveView에 template_name을 전달했다
+    """
 def vote(request, question_id):
     # request는 Httprequest의 개체이다
     question = get_object_or_404(Question, pk=question_id)

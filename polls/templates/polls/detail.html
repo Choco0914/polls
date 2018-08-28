@@ -1,14 +1,29 @@
 <h1>{{ question.question_text }}</h1>
-<ul>
-  {% for choic in question.choice_set.all %}
-    <li>{{ choice.choice_text }}</li>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<form action="{% url 'polls:vote' question.id %}" method="post">
+{% csrf_token %}
+<!-- 폼의 action {% url 'polls:vote' question.id %}로 설정하고, method="post"로
+설정했다 이 폼을 전송하는 행위는 서버측 자료를 변경할 것이므로, method = "post"
+(method="get"와 반대로 )를 사용하는 것은 매우 중요하다. 서버측 자료를 변경하는
+폼을 작성할 때마다,, method="post"를 사용하자 이 팁은 Django에만 국한되지 않는다
+보안상의 이유료 post를 꼭쓰자 그리고 우리는 POST폼 을 만들고있으므로, 사이트 간
+요청 위조에 대해 고민해봐야 한다 고맙게도, Django는 사이트 간 요청 위조에 대항하기
+위한 사용하기 쉬운 시스템을 가지고 있기 때문에, 심각하게 고민할 필요없다, 간단히
+말해서 내부 URL들로 향하는 모든 POST 폼에 템플릿 태그 {% csrf_token %}를
+사용하면 된다-->
+  {% for choice in question.choice_set.all %}
+  <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+  <!-- 각 질문 선택 항목에 대한 라디오 버튼을 표시한다, 각 라디오 버튼의 vlaue는
+   연관된 질문 선택 항목의 ID이다 각 라디오 버튼의 name은 "choice"이다 즉, 누군가
+   라디오 버튼 중 하나를 선택하여 제출하면, POST 데이터인 choice=#을 보낼 것이다
+   #은 선택한 항목의 ID이다 이것은 HTML폼의 기본 개념이다 -->
+  <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+  <!-- forloop.counter는 for 태그가 반복한 횟수를 나타낸다 -->
   {% endfor %}
-</ul>
+  <input type="submit" value="Vote">
+</form>
 <!-- template 시스템은 변수의 속성에 접근하기 위해 점-탐색(dot-lookup)문법을
 사용한다 예제의 {{ question.question_text }} 구문을 보면, Django는 먼저
 question객체에 대해 사전형으로 탐색후 탐색에 실패하게되면 속성갑으로 탐색한다
 (여기서는 속성값에서 탐색이 완료된다) 만약 속성 탐색에도 실패한다면 리스트의
 인덱스 탐색을 시도하게 된다
-{% for %}반복 구문에서 메소드 호출이 일어난다 question.choice_set.all 은 Python
-에서 question.choice_set.all()코드로 해석되는데, 이때 반환된 Choice 객체의 반복자는
-{% for %}에서 사용하기 적당하다

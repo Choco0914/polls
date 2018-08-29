@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
+from django.utils import timezone
 """
 template 에 context를 채워 표현한 결과를 HttpResponse 객체와 함께 돌려주는 구문은
 자주 쓰인다 따라서 Django는 이런 표현을 쉽게 표현할수 있도록 단축 기능(shortcuts)을
@@ -19,12 +20,17 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published question."""
-        return Question.objects.order_by('-pub_date')[:5]
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()
+        ).order_by('-pub_date')[:5]
 
 class DetailView(generic.DetailView):
     model = Question
     template_name = 'polls/detail.html'
-
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now())
+        #사용자가 URl을 알고있거나, 추축하여 미래의 설문들의 목록에 접근할수있어서
+        #위와같이 수정했다
 class ResultsView(generic.DetailView):
     model = Question
     template_name= 'polls/results.html'

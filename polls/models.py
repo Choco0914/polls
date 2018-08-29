@@ -20,6 +20,10 @@ class Question(models.Model):
     # __str__() 메소드를 추가하는것은 객체의 표현을 대화식 프롬프트에서 편하게
     # 보려는 이유 말고도, Django가 자동으로 생성하는 관리 사이트 에서도 표현이
     # 사용되기 때문이다
+    def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete = models.CASCADE)
     # ForeignKey는 각각의 Choice 가 하나의 Question에 관계된다는 것을
@@ -30,5 +34,8 @@ class Choice(models.Model):
     # 기본값을 0으로 설정하였다
     def __str__(self):
         return self.choice_text
+        # __str__() 메소드를 추가하는것은 객체의 표현을 대화식 프롬프트에서 편하게
+        # 보려는 이유 말고도, Django가 자동으로 생성하는 관리 사이트 에서도 표현이
+        # 사용되기 때문이다
 # 각 모델은 django.db.models.Model 이라는 클래스의 서브클래스로 표현한다
 # 각각의 클래스 변수들은 모델의 데이터베이스 필드를 나타낸다

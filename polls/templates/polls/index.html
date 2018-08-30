@@ -1,7 +1,12 @@
+{% load static %}
+
+<link rel="stylesheet" type= "text/css" href="{% static 'polls/style.css' %}">
+<!--index.html에 css를 연결하기 위해 위와같은 코드를 추가하였다 -->
 {% if latest_question_list %}
   <ul>
     {% for question in latest_question_list %}
-      <li><a href="{% url 'polls:detail' question.id }">{{ question.question_text}}</a>
+      <li><a href=
+        "{% url 'polls:detail' question.id }">{{question.question_text}}</a>
       </li>
     {% endfor %}
   </ul>
